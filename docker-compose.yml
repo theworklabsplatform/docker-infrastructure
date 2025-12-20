@@ -1,0 +1,260 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # REVERSE PROXY - Routes all traffic by hostname
+  # ============================================
+  nginx:
+    image: nginx:latest
+    container_name: infrastructure-nginx
+    restart: on-failure
+    ports:
+      - '${PUBLIC_PORT:-80}:80'
+      - '${PUBLIC_SSL_PORT:-443}:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./shared/certbot/www:/var/www/certbot:ro
+      - ./shared/certbot/conf:/etc/nginx/ssl:ro
+    networks:
+      - infrastructure_network
+    depends_on:
+      - bigcapital-server
+      - bigcapital-webapp
+      - corteza-server
+      - corteza-docs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================
+  # BIGCAPITAL - Accounting Application
+  # ============================================
+  bigcapital-webapp:
+    container_name: bigcapital-webapp
+    image: registry.theworklabscloud.com/crm/theworklabs-accounts-webapp:v1
+    platform: linux/amd64
+    restart: on-failure
+    networks:
+      - infrastructure_network
+    env_file:
+      - apps/bigcapital/.env
+    expose:
+      - '80'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  bigcapital-server:
+    container_name: bigcapital-server
+    image: registry.theworklabscloud.com/crm/theworklabs-accounts-server:v1
+    platform: linux/amd64
+    restart: on-failure
+    networks:
+      - infrastructure_network
+    env_file:
+      - apps/bigcapital/.env
+    expose:
+      - '3000'
+    depends_on:
+      - bigcapital-mysql
+      - bigcapital-mongo
+      - bigcapital-redis
+      - bigcapital-database-migration
+    links:
+      - bigcapital-mysql
+      - bigcapital-mongo
+      - bigcapital-redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  bigcapital-database-migration:
+    container_name: bigcapital-database-migration
+    image: registry.theworklabscloud.com/crm/theworklabs-accounts-migration:v1
+    platform: linux/amd64
+    environment:
+      # Database
+      - DB_HOST=bigcapital-mysql
+      - DB_USER=bigcapital
+      - DB_PASSWORD=bigcapital
+      - DB_CHARSET=utf8
+      - SYSTEM_DB_NAME=bigcapital_system
+      # Tenants databases
+      - TENANT_DB_NAME_PERFIX=bigcapital_tenant_
+    depends_on:
+      - bigcapital-mysql
+    networks:
+      - infrastructure_network
+
+  bigcapital-mysql:
+    container_name: bigcapital-mysql
+    restart: on-failure
+    build:
+      context: ../bigcapital/docker/mariadb
+    networks:
+      - infrastructure_network
+    env_file:
+      - apps/bigcapital/.env
+    environment:
+      - MYSQL_DATABASE=bigcapital_system
+      - MYSQL_USER=bigcapital
+      - MYSQL_PASSWORD=bigcapital
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - bigcapital-mysql:/var/lib/mysql
+    expose:
+      - '3306'
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  bigcapital-mongo:
+    container_name: bigcapital-mongo
+    restart: on-failure
+    build:
+      context: ../bigcapital/docker/mongo
+    networks:
+      - infrastructure_network
+    volumes:
+      - bigcapital-mongo:/var/lib/mongodb
+    expose:
+      - '27017'
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  bigcapital-redis:
+    container_name: bigcapital-redis
+    restart: on-failure
+    build:
+      context: ../bigcapital/docker/redis
+    networks:
+      - infrastructure_network
+    volumes:
+      - bigcapital-redis:/data
+    expose:
+      - '6379'
+
+  bigcapital-gotenberg:
+    image: gotenberg/gotenberg:7
+    container_name: bigcapital-gotenberg
+    restart: on-failure
+    networks:
+      - infrastructure_network
+    expose:
+      - '9000'
+
+  # ============================================
+  # CORTEZA - CRM Application
+  # ============================================
+  corteza-server:
+    container_name: corteza-server
+    image:   registry.theworklabscloud.com/crm/theworklabs-crm:v1
+    platform: linux/amd64
+    restart: always
+    networks:
+      - infrastructure_network
+    env_file:
+      - apps/corteza/.env
+    depends_on:
+      - corteza-db
+    volumes:
+      - corteza-data:/data
+    expose:
+      - '80'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  corteza-docs:
+    container_name: corteza-docs
+    image: registry.theworklabscloud.com/crm/theworklabs-docs:v1
+    platform: linux/amd64
+    restart: always
+    networks:
+      - infrastructure_network
+    expose:
+      - '80'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  corteza-db:
+    container_name: corteza-db
+    image: postgres:15
+    platform: linux/amd64
+    restart: always
+    environment:
+      POSTGRES_USER: corteza
+      POSTGRES_PASSWORD: corteza
+    networks:
+      - infrastructure_network
+    volumes:
+      - corteza-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U corteza"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # SSL CERTIFICATE MANAGEMENT (Optional)
+  # ============================================
+  certbot:
+    image: certbot/certbot:latest
+    container_name: infrastructure-certbot
+    restart: unless-stopped
+    profiles: ["${ENABLE_CERTBOT:-}"]
+    networks:
+      - infrastructure_network
+    volumes:
+      - ./shared/certbot/www:/var/www/certbot:rw
+      - ./shared/certbot/conf:/etc/letsencrypt:rw
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew -q; sleep 12h & wait $${!}; done;'"
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+  # BigCapital volumes
+  bigcapital-mysql:
+    name: infrastructure_bigcapital_mysql
+    driver: local
+  bigcapital-mongo:
+    name: infrastructure_bigcapital_mongo
+    driver: local
+  bigcapital-redis:
+    name: infrastructure_bigcapital_redis
+    driver: local
+
+  # Corteza volumes
+  corteza-db:
+    name: infrastructure_corteza_db
+    driver: local
+  corteza-data:
+    name: infrastructure_corteza_data
+    driver: local
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+  infrastructure_network:
+    driver: bridge
+    name: infrastructure_network
