@@ -21,6 +21,7 @@ services:
     depends_on:
       - bigcapital-server
       - bigcapital-webapp
+      - bigcapital-docs
       - corteza-server
       - corteza-docs
     healthcheck:
@@ -42,6 +43,21 @@ services:
       - infrastructure_network
     env_file:
       - apps/bigcapital/.env
+    expose:
+      - '80'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  bigcapital-docs:
+    container_name: bigcapital-docs
+    image: registry.theworklabscloud.com/crm/theworklabs-accounts-docs:v1
+    platform: linux/amd64
+    restart: on-failure
+    networks:
+      - infrastructure_network
     expose:
       - '80'
     healthcheck:
