@@ -15,28 +15,29 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./shared/certbot/www:/var/www/certbot:ro
-      - ./shared/certbot/conf:/etc/nginx/ssl:ro
+      - ./shared/certbot/conf:/etc/letsencrypt:ro
     networks:
       - infrastructure_network
     depends_on:
       - bigcapital-server
       - bigcapital-webapp
-      - bigcapital-docs
+      # - bigcapital-docs
       - corteza-server
       - corteza-docs
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
 
   # ============================================
   # BIGCAPITAL - Accounting Application
   # ============================================
   bigcapital-webapp:
     container_name: bigcapital-webapp
-    image: registry.theworklabscloud.com/crm/theworklabs-accounts-webapp:v1
+    image: venugopalhegde/theworklabs-accounts-webapp:v4
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -53,7 +54,7 @@ services:
 
   bigcapital-docs:
     container_name: bigcapital-docs
-    image: registry.theworklabscloud.com/crm/theworklabs-accounts-docs:v1
+    image: venugopalhegde/theworklabs-accounts-docs:v2
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -68,7 +69,7 @@ services:
 
   bigcapital-server:
     container_name: bigcapital-server
-    image: registry.theworklabscloud.com/crm/theworklabs-accounts-server:v1
+    image: venugopalhegde/theworklabs-accounts-server:v7
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -86,22 +87,20 @@ services:
       - bigcapital-mysql
       - bigcapital-mongo
       - bigcapital-redis
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   bigcapital-database-migration:
     container_name: bigcapital-database-migration
-    image: registry.theworklabscloud.com/crm/theworklabs-accounts-migration:v1
+    image: venugopalhegde/theworklabs-accounts-migration:v2
     platform: linux/amd64
+    env_file:
+      - apps/bigcapital/.env
     environment:
       # Database
       - DB_HOST=bigcapital-mysql
+      - DB_PORT=5432
       - DB_USER=bigcapital
       - DB_PASSWORD=bigcapital
-      - DB_CHARSET=utf8
+      - DB_DIALECT=postgres
       - SYSTEM_DB_NAME=bigcapital_system
       # Tenants databases
       - TENANT_DB_NAME_PERFIX=bigcapital_tenant_
@@ -112,27 +111,18 @@ services:
 
   bigcapital-mysql:
     container_name: bigcapital-mysql
+    image: postgres:15
     restart: on-failure
-    build:
-      context: ./apps/bigcapital/docker/mariadb
     networks:
       - infrastructure_network
-    env_file:
-      - apps/bigcapital/.env
     environment:
-      - MYSQL_DATABASE=bigcapital_system
-      - MYSQL_USER=bigcapital
-      - MYSQL_PASSWORD=bigcapital
-      - MYSQL_ROOT_PASSWORD=root
+      - POSTGRES_DB=bigcapital_system
+      - POSTGRES_USER=bigcapital
+      - POSTGRES_PASSWORD=bigcapital
     volumes:
-      - bigcapital-mysql:/var/lib/mysql
+      - bigcapital-mysql:/var/lib/postgresql/data
     expose:
-      - '3306'
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - '5432'
 
   bigcapital-mongo:
     container_name: bigcapital-mongo
@@ -155,7 +145,7 @@ services:
     container_name: bigcapital-redis
     restart: on-failure
     build:
-      context: ./apps/bigcapital/redis
+      context: ./apps/bigcapital/docker/redis
     networks:
       - infrastructure_network
     volumes:
@@ -177,7 +167,7 @@ services:
   # ============================================
   corteza-server:
     container_name: corteza-server
-    image:   registry.theworklabscloud.com/crm/theworklabs-crm:v1
+    image:   venugopalhegde/corteza:v22
     platform: linux/amd64
     restart: always
     networks:
@@ -198,7 +188,7 @@ services:
 
   corteza-docs:
     container_name: corteza-docs
-    image: registry.theworklabscloud.com/crm/theworklabs-docs:v1
+    image: venugopalhegde/corteza-docs:v3
     platform: linux/amd64
     restart: always
     networks:
@@ -219,6 +209,8 @@ services:
     environment:
       POSTGRES_USER: corteza
       POSTGRES_PASSWORD: corteza
+    expose:
+      - '5432'
     networks:
       - infrastructure_network
     volumes:
@@ -236,7 +228,7 @@ services:
     image: certbot/certbot:latest
     container_name: infrastructure-certbot
     restart: unless-stopped
-    profiles: ["${ENABLE_CERTBOT:-}"]
+    # profiles: ["${ENABLE_CERTBOT:-}"]
     networks:
       - infrastructure_network
     volumes:

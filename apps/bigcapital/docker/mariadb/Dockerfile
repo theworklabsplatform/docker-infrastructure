@@ -1,4 +1,4 @@
-FROM mariadb:10.2
+FROM mysql:8.0
 
 USER root
 ADD my.cnf /etc/mysql/conf.d/my.cnf
