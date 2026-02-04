@@ -118,6 +118,11 @@ docker compose run --rm certbot certonly \
   -d crm.theworklabs.cc
 WARN[0000] /home/ubuntu/docker-infrastructure/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
 
+docker compose run --rm certbot certonly \
+  --webroot -w /var/www/certbot \
+  --email venuhegde6@gmail.com \
+  --agree-tos --no-eff-email \
+  -d web.theworklabs.cc
 
 docker compose run --rm   --entrypoint ""   certbot certbot certonly   --non-interactive   --webroot -w /var/www/certbot   --email venuhegde6@gmail.com   --agree-tos --no-eff-email   -d crm.theworklabs.cc
 

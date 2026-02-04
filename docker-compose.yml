@@ -201,6 +201,29 @@ services:
       timeout: 10s
       retries: 3
 
+  # ============================================
+  # WHATSAPP CHAT APPLICATION
+  # ============================================
+  whatsapp-chat:
+    image: venugopalhegde/whatsapp-chat:v2
+    platform: linux/amd64
+    container_name: whatsapp-chat-app
+    ports:
+      - "3000:3000"
+    env_file:
+      - apps/whatsapp-chat/.env
+    environment:
+      # Runtime environment variables
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   corteza-db:
     container_name: corteza-db
     image: postgres:15
