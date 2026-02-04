@@ -37,7 +37,7 @@ services:
   # ============================================
   bigcapital-webapp:
     container_name: bigcapital-webapp
-    image: venugopalhegde/theworklabs-accounts-webapp:v4
+    image: venugopalhegde/theworklabs-accounts-webapp:v6
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -69,7 +69,7 @@ services:
 
   bigcapital-server:
     container_name: bigcapital-server
-    image: venugopalhegde/theworklabs-accounts-server:v7
+    image: venugopalhegde/theworklabs-accounts-server:v15
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -160,14 +160,14 @@ services:
     networks:
       - infrastructure_network
     expose:
-      - '9000'
+      - '3000'
 
   # ============================================
   # CORTEZA - CRM Application
   # ============================================
   corteza-server:
     container_name: corteza-server
-    image:   venugopalhegde/corteza:v22
+    image:   venugopalhegde/corteza:v24
     platform: linux/amd64
     restart: always
     networks:
