@@ -24,6 +24,7 @@ services:
       # - bigcapital-docs
       - corteza-server
       - corteza-docs
+      - whatsapp-chat
 
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost/health"]
