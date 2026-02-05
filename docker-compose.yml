@@ -256,11 +256,11 @@ services:
       timeout: 20s
       retries: 3
 
-   corteza-db:
-     container_name: corteza-db
-     image: postgres:15
-     platform: linux/amd64
-     restart: always
+  corteza-db:
+    container_name: corteza-db
+    image: postgres:15
+    platform: linux/amd64
+    restart: always
     environment:
       POSTGRES_USER: corteza
       POSTGRES_PASSWORD: corteza
