@@ -206,7 +206,7 @@ services:
   # WHATSAPP CHAT APPLICATION
   # ============================================
   whatsapp-chat:
-    image: venugopalhegde/whatsapp-chat:v6
+    image: venugopalhegde/whatsapp-chat:v7
     platform: linux/amd64
     container_name: whatsapp-chat-app
     ports:
