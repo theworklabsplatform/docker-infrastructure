@@ -126,5 +126,6 @@ docker compose run --rm certbot certonly \
 
 docker compose run --rm   --entrypoint ""   certbot certbot certonly   --non-interactive   --webroot -w /var/www/certbot   --email venuhegde6@gmail.com   --agree-tos --no-eff-email   -d crm.theworklabs.cc
 
+ sudo certbot certonly --standalone   -d supabase.theworklabs.cc   --email venuhegde6@gmail.com   --agree-tos   --non-interactive
 
 
