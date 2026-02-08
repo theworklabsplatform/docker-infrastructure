@@ -70,7 +70,7 @@ services:
 
   bigcapital-server:
     container_name: bigcapital-server
-    image: venugopalhegde/theworklabs-accounts-server:v15
+    image: venugopalhegde/theworklabs-accounts-server:v16
     platform: linux/amd64
     restart: on-failure
     networks:
