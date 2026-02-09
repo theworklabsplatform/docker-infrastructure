@@ -161,7 +161,12 @@ services:
     networks:
       - infrastructure_network
     expose:
-      - '3000'
+      - "3000"
+    command:
+      - "gotenberg"
+      - "--chromium-auto-start=true"
+      # optional but useful if cold start is slow:
+      - "--api-timeout=60s"
 
   # ============================================
   # CORTEZA - CRM Application
