@@ -38,7 +38,7 @@ services:
   # ============================================
   bigcapital-webapp:
     container_name: bigcapital-webapp
-    image: venugopalhegde/theworklabs-accounts-webapp:v6
+    image: venugopalhegde/theworklabs-accounts-webapp:v7
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -70,7 +70,7 @@ services:
 
   bigcapital-server:
     container_name: bigcapital-server
-    image: venugopalhegde/theworklabs-accounts-server:v16
+    image: venugopalhegde/theworklabs-accounts-server:v17
     platform: linux/amd64
     restart: on-failure
     networks:
