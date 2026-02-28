@@ -38,7 +38,7 @@ services:
   # ============================================
   bigcapital-webapp:
     container_name: bigcapital-webapp
-    image: venugopalhegde/theworklabs-accounts-webapp:v8
+    image: venugopalhegde/theworklabs-accounts-webapp:v9
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -70,7 +70,7 @@ services:
 
   bigcapital-server:
     container_name: bigcapital-server
-    image: venugopalhegde/theworklabs-accounts-server:v18
+    image: venugopalhegde/theworklabs-accounts-server:v19
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -91,7 +91,7 @@ services:
 
   bigcapital-database-migration:
     container_name: bigcapital-database-migration
-    image: venugopalhegde/theworklabs-accounts-migration:v3
+    image: venugopalhegde/theworklabs-accounts-migration:v4
     platform: linux/amd64
     env_file:
       - apps/bigcapital/.env
