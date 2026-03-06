@@ -70,7 +70,7 @@ services:
 
   bigcapital-server:
     container_name: bigcapital-server
-    image: registry.theworklabscloud.com/crm/theworklabs-accounts-server:v20
+    image: registry.theworklabscloud.com/crm/theworklabs-accounts-server:v21
     platform: linux/amd64
     restart: on-failure
     networks:
