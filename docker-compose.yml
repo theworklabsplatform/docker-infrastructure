@@ -38,7 +38,7 @@ services:
   # ============================================
   bigcapital-webapp:
     container_name: bigcapital-webapp
-    image: registry.theworklabscloud.com/crm/theworklabs-accounts-webapp:v10
+    image: registry.theworklabscloud.com/crm/theworklabs-accounts-webapp:v11
     platform: linux/amd64
     restart: on-failure
     networks:
@@ -70,7 +70,7 @@ services:
 
   bigcapital-server:
     container_name: bigcapital-server
-    image: registry.theworklabscloud.com/crm/theworklabs-accounts-server:v21
+    image: registry.theworklabscloud.com/crm/theworklabs-accounts-server:v22
     platform: linux/amd64
     restart: on-failure
     networks:
