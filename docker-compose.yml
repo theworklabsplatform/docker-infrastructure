@@ -163,11 +163,11 @@ services:
     expose:
       - '3000'
     environment:
-      - GOTENBERG_CHROMIUM_AUTO_START=true
-      - GOTENBERG_API_TIMEOUT=60s
-      - GOTENBERG_CHROMIUM_START_TIMEOUT=60s
-      - GOTENBERG_CHROMIUM_RESTART_AFTER=100
-      - GOTENBERG_CHROMIUM_MAX_QUEUE_SIZE=50
+      - CHROMIUM_AUTO_START=true
+      - API_TIMEOUT=60s
+      - CHROMIUM_START_TIMEOUT=60s
+      - CHROMIUM_RESTART_AFTER=100
+      - CHROMIUM_MAX_QUEUE_SIZE=50
 
   # ============================================
   # CORTEZA - CRM Application
