@@ -162,13 +162,13 @@ services:
       - infrastructure_network
     expose:
       - '3000'
-    command:
-      - "gotenberg"
-      - "--chromium-auto-start=true"
-      - "--api-timeout=60s"
-      # Recommended performance flags:
-      - "--chromium-restart-after=100"
-      - "--chromium-max-queue-size=50"
+    command: >
+      gotenberg 
+      --chromium-auto-start=true 
+      --api-timeout=60s 
+      --chromium-start-timeout=60s
+      --chromium-restart-after=100 
+      --chromium-max-queue-size=50
 
   # ============================================
   # CORTEZA - CRM Application
