@@ -20,7 +20,7 @@ services:
       - infrastructure_network
     depends_on:
       - bigcapital-server
-      - bigcapital-webapp
+      # - bigcapital-webapp
       # - bigcapital-docs
       - corteza-server
       - corteza-docs
