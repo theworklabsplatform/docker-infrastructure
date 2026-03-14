@@ -211,27 +211,27 @@ services:
   # ============================================
   # WHATSAPP CHAT APPLICATION
   # ============================================
-  whatsapp-chat:
-    image: venugopalhegde/whatsapp-chat:v11
-    platform: linux/amd64
-    container_name: whatsapp-chat-app
-    ports:
-      - "3000:3000"
-    env_file:
-      - apps/whatsapp-chat/.env
-    environment:
-      # Runtime environment variables
-      - NODE_ENV=production
-      - NEXT_TELEMETRY_DISABLED=1
-    restart: unless-stopped
-    networks:
-      - infrastructure_network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+  # whatsapp-chat:
+  #   image: venugopalhegde/whatsapp-chat:v11
+  #   platform: linux/amd64
+  #   container_name: whatsapp-chat-app
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - apps/whatsapp-chat/.env
+  #   environment:
+  #     # Runtime environment variables
+  #     - NODE_ENV=production
+  #     - NEXT_TELEMETRY_DISABLED=1
+  #   restart: unless-stopped
+  #   networks:
+  #     - infrastructure_network
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
 
   # ============================================
   # MINIO - S3 Compatible Object Storage
