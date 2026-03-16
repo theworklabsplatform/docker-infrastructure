@@ -29,7 +29,7 @@ services:
       - bigcapital-docs
       - corteza-server
       - corteza-docs
-      # - whatsapp-chat
+      - whatsapp-chat
 
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost/health"]
@@ -246,27 +246,31 @@ services:
   # ============================================
   # WHATSAPP CHAT APPLICATION
   # ============================================
-  # whatsapp-chat:
-  #   image: venugopalhegde/whatsapp-chat:v11
-  #   platform: linux/amd64
-  #   container_name: whatsapp-chat-app
-  #   ports:
-  #     - "3000:3000"
-  #   env_file:
-  #     - apps/whatsapp-chat/.env
-  #   environment:
-  #     # Runtime environment variables
-  #     - NODE_ENV=production
-  #     - NEXT_TELEMETRY_DISABLED=1
-  #   restart: unless-stopped
-  #   networks:
-  #     - infrastructure_network
-  #   healthcheck:
-  #     test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health || exit 1"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 40s
+  whatsapp-chat:
+    image: registry.theworklabscloud.com/crm/theworklabs-whatsapp-chat:v1
+    platform: linux/amd64
+    container_name: whatsapp-chat-app
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "7"
+    networks:
+      - infrastructure_network
+    env_file:
+      - apps/whatsapp-chat/.env
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    expose:
+      - '3000'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # ============================================
   # MINIO - S3 Compatible Object Storage
