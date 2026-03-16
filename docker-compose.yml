@@ -85,7 +85,7 @@ services:
 
   bigcapital-server:
     container_name: bigcapital-server
-    image: registry.theworklabscloud.com/crm/theworklabs-accounts-server:v34
+    image: registry.theworklabscloud.com/crm/theworklabs-accounts-server:v35
     platform: linux/amd64
     restart: on-failure
     logging:
