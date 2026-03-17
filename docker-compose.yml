@@ -247,7 +247,7 @@ services:
   # WHATSAPP CHAT APPLICATION
   # ============================================
   whatsapp-chat:
-    image: registry.theworklabscloud.com/crm/theworklabs-whatsapp-chat:v1
+    image: registry.theworklabscloud.com/crm/theworklabs-whatsapp-chat:v2
     platform: linux/amd64
     container_name: whatsapp-chat-app
     restart: on-failure
