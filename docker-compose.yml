@@ -286,7 +286,7 @@ services:
         max-file: "7"
     networks:
       - infrastructure_network
-    ports:
+    expose:
       - "9000:9000"
       - "9001:9001"
     environment:
